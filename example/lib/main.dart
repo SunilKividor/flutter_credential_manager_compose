@@ -2,9 +2,9 @@ import 'package:credential_manager/credential_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
-const clientId = '556758121360-bag4hc2bdim55s3dgm9cte668u95dbht.apps.googleusercontent.com';
+const clientId = '';
 final scopes = ['https://www.googleapis.com/auth/drive.file'];
-const webClientId = '556758121360-dpannkc5mitjus0nn1ig5536kjdre7gg.apps.googleusercontent.com';
+const webClientId = '';
 
 Future<void> main() async {
    WidgetsFlutterBinding.ensureInitialized();
