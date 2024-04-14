@@ -1,286 +1,82 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:async';
-import 'dart:developer';
-
 import 'package:credential_manager/credential_manager.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
-// Create an instance of CredentialManager for managing credentials
-CredentialManager credentialManager = CredentialManager();
+const clientId = '556758121360-bag4hc2bdim55s3dgm9cte668u95dbht.apps.googleusercontent.com';
+final scopes = ['https://www.googleapis.com/auth/drive.file'];
+const webClientId = '556758121360-dpannkc5mitjus0nn1ig5536kjdre7gg.apps.googleusercontent.com';
 
-//Google Client Id for google login
-
-const String googleClientId = String.fromEnvironment("Google-web-client-id");
-// Main entry point of the application
 Future<void> main() async {
-  // Ensure that the Flutter app is initialized
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize CredentialManager if the platform is supported
-  if (credentialManager.isSupportedPlatform) {
-    await credentialManager.init(
-        preferImmediatelyAvailableCredentials: true,
-        //optional perameter for integrate google signing
-        googleClientId: googleClientId);
-  }
-
-  // Run the app
+   WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
-// The main application widget
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Credential Manager Example",
       debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
       theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: const CredentialsScreen(),
     );
   }
 }
 
-// Widget for the login screen
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+
+final logger = Logger();
+CredentialManager credentialManager = CredentialManager();
+
+class CredentialsScreen extends StatefulWidget {
+  const CredentialsScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<CredentialsScreen> createState() => _CredentialsScreenState();
 }
 
-// State class for the login screen
-class _LoginScreenState extends State<LoginScreen> {
-  bool isLoading = false;
-  String? username;
+class _CredentialsScreenState extends State<CredentialsScreen> {
 
-  // Form key for validation
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String? password;
 
-  final secretKey = '1234567812345678'; // Use a secure key here
-  final ivKey = "xfpkDQJXIfb3mcnb";
+Future<void> signIn() async{
+  
+  try {
+      if(credentialManager.isSupportedPlatform){
+    await credentialManager.init(preferImmediatelyAvailableCredentials: true,
+        googleClientId: webClientId, 
+    );
+      logger.d("Entered try");
+     final gCredential= await credentialManager.saveGoogleCredential(nonce: Nonce(nonce: "jedn23iudbuyfb")); 
+      final idToken = gCredential!.idToken;
 
+  Logger().d("idToken : $idToken");
+}
+  } on CredentialException catch (e) {
+     logger.d("caught exception");
+     logger.d("error : ${e.code}");
+     logger.d("error : ${e.details}");
+    logger.d("error : ${e.message}");
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Credentials Manager"),
+        centerTitle: true,
+        title: const Text('Drive API Test'),
       ),
-      body: Stack(
+
+      body: Center(child: Column(
         children: [
-          // Main body with user input
-          AbsorbPointer(
-            absorbing: isLoading,
-            child: Opacity(
-              opacity: isLoading ? 0.5 : 1,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Username input field
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: TextFormField(
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            username = value;
-                          }
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Please enter a username";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Username",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Colors.blueAccent,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Password input field
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: TextFormField(
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            password = value;
-                          }
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Please enter a password";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "password",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: Colors.blueAccent,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Register button
-                    MaterialButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          onRegister();
-                        }
-                      },
-                      color: Colors.red,
-                      minWidth: MediaQuery.of(context).size.width / 2,
-                      height: 40,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Text(
-                        "Register",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                    // Login button
-                    MaterialButton(
-                      onPressed: () async {
-                        onLogin();
-                      },
-                      color: Colors.red,
-                      minWidth: MediaQuery.of(context).size.width / 2,
-                      height: 40,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Text(
-                        "Login in with saved credentials",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-
-                    //Google Sign In
-                    MaterialButton(
-                      onPressed: () async {
-                        try {
-                          final res =
-                              await credentialManager.saveGoogleCredential(nonce: Nonce(nonce: "hello"));
-                          if (kDebugMode) {
-                            print(res?.toJson());
-                          }
-                        } on CredentialException catch (e) {
-                          log(e.message);
-                        }
-                      },
-                      color: Colors.red,
-                      minWidth: MediaQuery.of(context).size.width / 2,
-                      height: 40,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Text(
-                        "Google Sign In",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          // Loading indicator
-          Opacity(
-            opacity: isLoading ? 1 : 0,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
+          ElevatedButton(onPressed:signIn, child: const Text('Sign in')),
+          // ElevatedButton(onPressed:createFile, child: const Text('Create File')),
         ],
-      ),
+      )),
     );
-  }
-
-  // Method for handling login process
-  onLogin() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      // Retrieve encrypted credentials and show a dialog on success
-      Credentials credential = await credentialManager.getEncryptedCredentials(
-          secretKey: secretKey, ivKey: ivKey);
-      bool isPasswordBasedCredentials = credential.passwordCredential != null;
-      var message =
-          "Credential Type:${isPasswordBasedCredentials ? "Password" : "Google base"}, ";
-      if (isPasswordBasedCredentials) {
-        message += credential.passwordCredential!.toJson().toString();
-      } else {
-        message += credential.googleIdTokenCredential!.toJson().toString();
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Successfully retrieved credential")));
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Login success"),
-          content: Text(message),
-        ),
-      );
-    } on CredentialException catch (e) {
-      // Show a snack bar on exception
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message.toString())));
-    } finally {
-      // Update the loading state
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  // Method for handling registration process
-  onRegister() async {
-    setState(() {
-      isLoading = true;
-    });
-    try {
-      // Save encrypted credentials and show a snackbar on success
-      await credentialManager.saveEncryptedCredentials(
-        credential: PasswordCredential(username: username, password: password),
-        secretKey: secretKey,
-        ivKey: ivKey,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Successfully saved credential")),
-      );
-    } on CredentialException catch (e) {
-      // Show a snack-bar on exception
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message.toString())));
-    } finally {
-      // Update the loading state
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
   }
 }
