@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         try {
                           final res =
-                              await credentialManager.saveGoogleCredential();
+                              await credentialManager.saveGoogleCredential(nonce: Nonce(nonce: "hello"));
                           if (kDebugMode) {
                             print(res?.toJson());
                           }

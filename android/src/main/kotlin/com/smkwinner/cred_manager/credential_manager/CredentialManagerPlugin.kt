@@ -51,7 +51,7 @@ class CredentialManagerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware 
                     when (call.method) {
                         "save_password_credentials" -> handleSavePasswordCredentials(call, result)
                         "get_password_credentials" -> handleGetPasswordCredentials(result)
-                        "save_google_credential" -> handleSaveGoogleCredential(result)
+                        "save_google_credential" -> handleSaveGoogleCredential(call, result)
                     }
                 } catch (e: Exception) {
                     result.error("204", "Login failed", e.localizedMessage)
@@ -116,9 +116,10 @@ class CredentialManagerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware 
         }
     }
 
-    private suspend fun handleSaveGoogleCredential(result: Result) {
+    private suspend fun handleSaveGoogleCredential(result: Result,nonce: String) {
+        val nonce: String? = call.argument("nonce")
         val (exception: CredentialManagerExceptions?, credential: GoogleIdTokenCredential?) =
-            utils.saveGoogleCredentials(context = currentContext)
+            utils.saveGoogleCredentials(context = currentContext,nonce = nonce)
 
         if (exception != null) {
             result.error(exception.code.toString(), exception.details, exception.message)

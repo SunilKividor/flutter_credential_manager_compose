@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 // ignore_for_file: unnecessary_getters_setters
 
 /// A class representing a password credential with optional username and password.
@@ -38,6 +41,21 @@ class PasswordCredential {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['username'] = _username;
     data['password'] = _password;
+    return data;
+  }
+}
+
+
+class Nonce {
+  final String nonce;
+  Nonce({
+    required this.nonce,
+  });
+  
+
+    Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['nonce'] = nonce;
     return data;
   }
 }

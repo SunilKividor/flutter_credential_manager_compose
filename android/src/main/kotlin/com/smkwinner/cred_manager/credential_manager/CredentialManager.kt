@@ -215,7 +215,7 @@ class CredentialManagerUtils {
      * @return A Pair containing either null and deserialized GoogleIdTokenCredential
      * or CredentialManagerExceptions and null if an error occurs.
      */
-    suspend fun saveGoogleCredentials(context: Context): Pair<CredentialManagerExceptions?, GoogleIdTokenCredential?> {
+    suspend fun saveGoogleCredentials(context: Context,nonce: String): Pair<CredentialManagerExceptions?, GoogleIdTokenCredential?> {
         if (!this::serverClientID.isInitialized) {
             return Pair(
                 CredentialManagerExceptions(
@@ -228,7 +228,7 @@ class CredentialManagerUtils {
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setNonce(System.currentTimeMillis().toString())
+            .setNonce(nonce)
             .setServerClientId(serverClientID)
             .build()
 
