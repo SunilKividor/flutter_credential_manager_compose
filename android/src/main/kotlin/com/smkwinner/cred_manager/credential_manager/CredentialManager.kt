@@ -225,6 +225,7 @@ class CredentialManagerUtils {
                 ), null
             )
         }
+        val googleId: GetGoogleIdOption = GetGoogleIdOption(serverClientId = serverClientID, nonce = nonce,filterByAuthorizedAccounts = false)
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
@@ -233,7 +234,7 @@ class CredentialManagerUtils {
             .build()
 
         val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
+            .addCredentialOption(googleId)
             .build()
 
         Log.d("CredentialManager", "$request")

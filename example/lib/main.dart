@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 
 const clientId = '';
 final scopes = ['https://www.googleapis.com/auth/drive.file'];
-const webClientId = '';
+const webClientId = '556758121360-dpannkc5mitjus0nn1ig5536kjdre7gg.apps.googleusercontent.com';
 
 Future<void> main() async {
    WidgetsFlutterBinding.ensureInitialized();
