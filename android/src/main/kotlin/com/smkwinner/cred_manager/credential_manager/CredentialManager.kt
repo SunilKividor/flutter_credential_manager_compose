@@ -242,13 +242,16 @@ class CredentialManagerUtils {
             .addCredentialOption(googleId)
             .build()
 
+
         Log.d("CredentialManager", "$request")
         val result = credentialManager.getCredential(
             request = request,
             context = context,
         )
-        val data = result.credential.data
-        Log.d("---------data--------", "$data")
+
+        val data = result.credential
+        println("---------data--------$data")
+
         when (val credential = result.credential) {
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
@@ -257,6 +260,9 @@ class CredentialManagerUtils {
                         // authenticate on your server.
                         val googleIdTokenCredential = GoogleIdTokenCredential
                             .createFrom(credential.data)
+                            val data = result.credential.data
+                        println("---------data--------$data")
+                            Log.d("---------data--------", "$data")
                         Pair(null, googleIdTokenCredential)
                     } catch (e: GoogleIdTokenParsingException) {
                         Pair(
