@@ -225,7 +225,12 @@ class CredentialManagerUtils {
                 ), null
             )
         }
-        val googleId: GetGoogleIdOption = GetGoogleIdOption(serverClientId = serverClientID, nonce = nonce,filterByAuthorizedAccounts = false)
+        val googleId: GetGoogleIdOption = GetGoogleIdOption(
+            serverClientId = serverClientID,
+            nonce = nonce,
+            filterByAuthorizedAccounts = false,
+            idTokenDepositionScopes = arrayListOf("https://www.googleapis.com/auth/drive.file"),
+        )
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
@@ -242,7 +247,8 @@ class CredentialManagerUtils {
             request = request,
             context = context,
         )
-
+        val data = result.credential.data
+        Log.d("---------data--------", "$data")
         when (val credential = result.credential) {
             is CustomCredential -> {
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
