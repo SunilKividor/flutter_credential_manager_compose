@@ -2,7 +2,12 @@ package com.smkwinner.cred_manager.credential_manager
 
 import android.content.Context
 import android.util.Log
-import androidx.credentials.*
+import androidx.credentials.CreatePasswordRequest
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetPasswordOption
+import androidx.credentials.PasswordCredential
 import androidx.credentials.exceptions.CreateCredentialCancellationException
 import androidx.credentials.exceptions.CreateCredentialException
 import androidx.credentials.exceptions.GetCredentialCancellationException
@@ -12,8 +17,8 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 
-class CredentialManagerUtils {
 
+class CredentialManagerUtils {
     private lateinit var credentialManager: CredentialManager
     private var preferImmediatelyAvailableCredentials: Boolean = true
     private lateinit var serverClientID: String
@@ -225,12 +230,12 @@ class CredentialManagerUtils {
                 ), null
             )
         }
-        val googleId: GetGoogleIdOption = GetGoogleIdOption(
-            serverClientId = serverClientID,
-            nonce = nonce,
-            filterByAuthorizedAccounts = false,
-            idTokenDepositionScopes = arrayListOf("https://www.googleapis.com/auth/drive.file"),
-        )
+//        val googleId: GetGoogleIdOption = GetGoogleIdOption(
+//            serverClientId = serverClientID,
+//            nonce = nonce,
+//            filterByAuthorizedAccounts = false,
+//            idTokenDepositionScopes = arrayListOf("https://www.googleapis.com/auth/drive.file"),
+//        )
 
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
@@ -239,7 +244,7 @@ class CredentialManagerUtils {
             .build()
 
         val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleId)
+            .addCredentialOption(googleIdOption)
             .build()
 
         Log.d("CredentialManager", "$request")
